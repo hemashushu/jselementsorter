@@ -1,31 +1,31 @@
 const assert = require('assert/strict');
 const domino = require('domino');
 
-const { Condition,
-    ElementSorter } = require('../index');
+const { ObjectSorter } = require('jsobjectutils');
+const { ElementSorter } = require('../index');
 
 describe('ElementSorter Test', () => {
-    describe('parseCondition test', () => {
-        let c1 = ElementSorter.parseCondition('name');
-        assert.equal(1, c1.length);
-        assert.equal(c1[0].fieldName, 'name');
-        assert.equal(c1[0].isAscendingOrder, true);
-
-        let c2 = ElementSorter.parseCondition('number DESC');
-        assert.equal(1, c2.length);
-        assert.equal(c2[0].isAscendingOrder, false);
-        assert.equal(c2[0].fieldName, 'number');
-
-        let c3 = ElementSorter.parseCondition('number DESC, name');
-        assert.equal(2, c3.length);
-        assert.equal(c3[0].fieldName, 'number');
-        assert.equal(c3[0].isAscendingOrder, false);
-        assert.equal(c3[1].fieldName, 'name');
-        assert.equal(c3[1].isAscendingOrder, true);
-
-        let c4 = ElementSorter.parseCondition('id, number DESC, name');
-        assert.equal(3, c4.length);
-    });
+//     describe('parseCondition test', () => {
+//         let c1 = ObjectSorter.parseOrderExpression('name');
+//         assert.equal(1, c1.length);
+//         assert.equal(c1[0].fieldName, 'name');
+//         assert.equal(c1[0].isAscendingOrder, true);
+//
+//         let c2 = ObjectSorter.parseOrderExpression('number DESC');
+//         assert.equal(1, c2.length);
+//         assert.equal(c2[0].isAscendingOrder, false);
+//         assert.equal(c2[0].fieldName, 'number');
+//
+//         let c3 = ObjectSorter.parseOrderExpression('number DESC, name');
+//         assert.equal(2, c3.length);
+//         assert.equal(c3[0].fieldName, 'number');
+//         assert.equal(c3[0].isAscendingOrder, false);
+//         assert.equal(c3[1].fieldName, 'name');
+//         assert.equal(c3[1].isAscendingOrder, true);
+//
+//         let c4 = ObjectSorter.parseOrderExpression('id, number DESC, name');
+//         assert.equal(3, c4.length);
+//     });
 
     // 项目元素内容如下：
     // <div class="item" data-id="1" data-type="foo" data-color="red"></div>
@@ -84,7 +84,7 @@ describe('ElementSorter Test', () => {
         it('Test order by: id', () => {
             let containerElement1 = createContainerElement();
             let itemElements1 = createItemElements();
-            let conditions1 = ElementSorter.parseCondition('id');
+            let conditions1 = ObjectSorter.parseOrderExpression('id');
             let lastElements = [];
 
             // insert id5 -> [id5]
@@ -111,7 +111,7 @@ describe('ElementSorter Test', () => {
         it('Test order by: id DESC', () => {
             let containerElement1 = createContainerElement();
             let itemElements1 = createItemElements();
-            let conditions1 = ElementSorter.parseCondition('id DESC');
+            let conditions1 = ObjectSorter.parseOrderExpression('id DESC');
             let lastElements = [];
 
             // insert id5 -> [id5]
@@ -138,7 +138,7 @@ describe('ElementSorter Test', () => {
         it('Test order by: checked, type DESC, id', () => {
             let containerElement1 = createContainerElement();
             let itemElements1 = createItemElements();
-            let conditions1 = ElementSorter.parseCondition('checked, type DESC, id');
+            let conditions1 = ObjectSorter.parseOrderExpression('checked, type DESC, id');
             let lastElements = [];
 
             ElementSorter.insertElement(containerElement1, lastElements,
@@ -159,20 +159,21 @@ describe('ElementSorter Test', () => {
             let lastElements = [];
 
             // [ 6, 9, 3, 5, 2, 1 ]
-            let conditions1 = ElementSorter.parseCondition('type');
+            let conditions1 = ObjectSorter.parseOrderExpression('type');
             ElementSorter.insertElement(containerElement1, lastElements,
                 itemElements1, conditions1, itemObjectMapFunc);
 
             assert(isMatchElementIds(containerElement1, [6, 9, 3, 5, 2, 1]));
 
             // [ 9, 6, 5, 3, 2, 1 ]
-            let conditions2 = ElementSorter.parseCondition('id DESC');
+            let conditions2 = ObjectSorter.parseOrderExpression('id DESC');
             ElementSorter.sortElements(containerElement1, lastElements,
                 conditions2, itemObjectMapFunc);
 
             assert(isMatchElementIds(containerElement1, [9, 6, 5, 3, 2, 1]));
 
-            let conditions3 = ElementSorter.parseCondition('type, id');
+            // [3, 6, 9, 1, 2, 5]
+            let conditions3 = ObjectSorter.parseOrderExpression('type, id');
             ElementSorter.sortElements(containerElement1, lastElements,
                 conditions3, itemObjectMapFunc);
 
